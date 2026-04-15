@@ -72,6 +72,33 @@ function M.setup(opts)
             utils.warn_once('nvim-dap-ui not installed, cannot register RTT element')
         end
     end
+
+    -- Register custom view with nvim-dap-view if available
+    local success, custom_view = pcall(require, 'dap-cortex-debug.dapview.custom')
+    if success then
+        local reg_success, reg_err = pcall(custom_view.register_view)
+        if not reg_success then
+            utils.warn_once('Failed to register custom view: ' .. reg_err)
+        end
+    else
+        utils.warn_once('Failed to load custom view module: ' .. custom_view)
+    end
+
+    -- Create user command to open custom view
+    local cmd_success, cmd_err = pcall(function()
+        vim.api.nvim_create_user_command('CortexDebugCustomView', function()
+            local ok, dap_view = pcall(require, 'dap-view')
+            if ok then
+                dap_view.show_view('custom_debug')
+            else
+                utils.warn_once('nvim-dap-view not installed, cannot open custom view')
+            end
+        end, { desc = 'Open custom debug view' })
+    end)
+    
+    if not cmd_success then
+        utils.warn_once('Failed to create custom view command: ' .. cmd_err)
+    end
 end
 
 ---@class RTTChannel

@@ -83,7 +83,7 @@ function M.setup()
 
         consoles.rtt_connect(rtt_opts, function(client, term)
             -- Notify our dapui element to update
-            require('dap-cortex-debug.dapui.rtt').on_rtt_connect(channel)
+            require('dap-cortex-debug.dapui.rtt_view').on_rtt_connect(channel)
 
             session:request('rtt-poll', nil, function(_, _) end)
 

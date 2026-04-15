@@ -67,7 +67,7 @@ function M.setup(opts)
     if config.dapui_rtt then
         local ok, dapui = pcall(require, 'dapui')
         if ok then
-            dapui.register_element('rtt', require('dap-cortex-debug.dapui.rtt'))
+            dapui.register_element('rtt', require('dap-cortex-debug.dapui.rtt_view'))
         else
             utils.warn_once('nvim-dap-ui not installed, cannot register RTT element')
         end
@@ -77,15 +77,12 @@ function M.setup(opts)
     if config.dapview_rtt then
         local ok, dap_view = pcall(require, 'dap-view')
         if ok then
+            local rtt_view = require('dap-cortex-debug.dapview.rtt_view')
             dap_view.register_view('rtt', {
                 label = 'RTT',
                 keymap = 'O',
-                action = function()
-                    require('dap-cortex-debug.dapview.rtt.view').show()
-                end,
-                buffer = function()
-                    return require('dap-cortex-debug.dapview.rtt.view').get_buffer()
-                end
+                action = rtt_view.show,
+                buffer = rtt_view.get_buffer
             })
         else
             utils.debug('nvim-dap-view not installed, cannot register RTT view')

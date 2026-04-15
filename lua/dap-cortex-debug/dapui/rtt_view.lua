@@ -1,16 +1,5 @@
 local consoles = require('dap-cortex-debug.consoles')
-
--- Find first open RTT channel
-local function find_rtt_channel()
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local name = vim.api.nvim_buf_get_name(buf)
-        local channel = name:match([[cortex%-debug://rtt:([0-9]+)]])
-        channel = vim.F.npcall(tonumber, channel)
-        if channel then
-            return channel
-        end
-    end
-end
+local rtt_utils = require('dap-cortex-debug.rtt')
 
 local tmp_buf
 
@@ -18,7 +7,7 @@ local tmp_buf
 return {
     render = function() end,
     buffer = function()
-        local channel = find_rtt_channel()
+        local channel = rtt_utils.find_rtt_channel()
         if not channel then
             if not tmp_buf or not vim.api.nvim_buf_is_valid(tmp_buf) then
                 tmp_buf = vim.api.nvim_create_buf(false, true)

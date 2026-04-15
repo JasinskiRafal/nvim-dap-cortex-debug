@@ -63,6 +63,7 @@ require('dap-cortex-debug').setup {
     lib_extension = nil, -- shared libraries extension, tries auto-detecting, e.g. 'so' on unix
     node_path = 'node', -- path to node.js executable
     dapui_rtt = true, -- register nvim-dap-ui RTT element
+    dapview_rtt = true, -- register nvim-dap-view RTT view
     -- make :DapLoadLaunchJSON register cortex-debug for C/C++, set false to disable
     dap_vscode_filetypes = { 'c', 'cpp' },
     rtt = {
@@ -162,6 +163,18 @@ require('dapui').setup {
     },
 }
 ```
+
+### DAP View
+
+This extension also registers an RTT view for [nvim-dap-view](https://github.com/igorlfs/nvim-dap-view), allowing you to view RTT output directly in the dap-view interface.
+
+```lua
+require('dap-cortex-debug').setup {
+    dapview_rtt = true, -- enable nvim-dap-view RTT integration (default: true)
+}
+```
+
+Once enabled, you can switch to the RTT view in nvim-dap-view using the designated keymap (default: 'O').
 
 ## Troubleshooting
 

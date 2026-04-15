@@ -72,6 +72,25 @@ function M.setup(opts)
             utils.warn_once('nvim-dap-ui not installed, cannot register RTT element')
         end
     end
+
+    -- Register RTT view with nvim-dap-view if available and enabled
+    if config.dapview_rtt then
+        local ok, dap_view = pcall(require, 'dap-view')
+        if ok then
+            dap_view.register_view('rtt', {
+                label = 'RTT',
+                keymap = 'O',
+                action = function()
+                    require('dap-cortex-debug.dapview.rtt.view').show()
+                end,
+                buffer = function()
+                    return require('dap-cortex-debug.dapview.rtt.view').get_buffer()
+                end
+            })
+        else
+            utils.debug('nvim-dap-view not installed, cannot register RTT view')
+        end
+    end
 end
 
 ---@class RTTChannel

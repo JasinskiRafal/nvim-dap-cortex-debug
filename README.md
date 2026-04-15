@@ -62,17 +62,55 @@ require('dap-cortex-debug').setup {
     extension_path = nil,
     lib_extension = nil, -- shared libraries extension, tries auto-detecting, e.g. 'so' on unix
     node_path = 'node', -- path to node.js executable
-    dapui_rtt = true, -- register nvim-dap-ui RTT element
-    dapview_rtt = true, -- register nvim-dap-view RTT view
     -- make :DapLoadLaunchJSON register cortex-debug for C/C++, set false to disable
     dap_vscode_filetypes = { 'c', 'cpp' },
     rtt = {
         buftype = 'Terminal', -- 'Terminal' or 'BufTerminal' for terminal buffer vs normal buffer
+        framework = 'auto',    -- 'auto' | 'dapui' | 'dapview' | false
+        -- 'auto': Try dapui first, then dapview (default)
+        -- 'dapui': Use only nvim-dap-ui
+        -- 'dapview': Use only nvim-dap-view
+        -- false: Disable RTT UI integration
     },
 }
 ```
 
 This will configure nvim-dap adapter (i.e. assign to `dap.adapters['cortex-debug']`) and set up required nvim-dap listeners.
+
+### Migration Guide
+
+#### RTT Configuration (v2.0+)
+
+The RTT configuration has been unified in v2.0:
+
+**Before (deprecated):**
+```lua
+{
+    dapui_rtt = true,    -- deprecated
+    dapview_rtt = true,   -- deprecated
+    rtt = {
+        buftype = 'Terminal',
+    },
+}
+```
+
+**After (recommended):**
+```lua
+{
+    rtt = {
+        buftype = 'Terminal',
+        framework = 'auto',  -- 'auto' | 'dapui' | 'dapview' | false
+    },
+}
+```
+
+**How it works:**
+- **'auto'**: Automatically detects and uses the first available framework (dapui → dapview)
+- **'dapui'**: Use only nvim-dap-ui
+- **'dapview'**: Use only nvim-dap-view  
+- **false**: Disable RTT UI integration
+
+**Migration:** Simply remove the old `dapui_rtt` and `dapview_rtt` settings and use the new `rtt.framework` option instead. The old settings will be ignored if present.
 
 Now define nvim-dap configuration for debugging, the format is the same as for
 [cortex-debug](https://github.com/Marus/cortex-debug/blob/master/debug_attributes.md).

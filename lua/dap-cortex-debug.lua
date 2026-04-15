@@ -64,17 +64,33 @@ function M.setup(opts)
         end, { desc = 'Open memory viewer', nargs = '+', range = 1 })
     end
 
-    if config.dapui_rtt then
+    -- Register RTT UI integration based on unified configuration
+    local framework = config.rtt.framework
+
+    if framework == false then
+        -- RTT UI disabled
+    elseif framework == 'auto' or framework == 'dapui' then
         local ok, dapui = pcall(require, 'dapui')
         if ok then
             dapui.register_element('rtt', require('dap-cortex-debug.dapui.rtt_view'))
+        elseif framework == 'dapui' then
+            utils.warn('nvim-dap-ui not installed, cannot register RTT element')
         else
-            utils.warn_once('nvim-dap-ui not installed, cannot register RTT element')
+            -- Try dapview in auto mode
+            local ok, dap_view = pcall(require, 'dap-view')
+            if ok then
+                local rtt_view = require('dap-cortex-debug.dapview.rtt_view')
+                dap_view.register_view('rtt', {
+                    label = 'RTT',
+                    keymap = 'O',
+                    action = rtt_view.show,
+                    buffer = rtt_view.get_buffer
+                })
+            elseif framework ~= false then
+                utils.warn('Neither nvim-dap-ui nor nvim-dap-view installed, RTT output will not be displayed')
+            end
         end
-    end
-
-    -- Register RTT view with nvim-dap-view if available and enabled
-    if config.dapview_rtt then
+    elseif framework == 'dapview' then
         local ok, dap_view = pcall(require, 'dap-view')
         if ok then
             local rtt_view = require('dap-cortex-debug.dapview.rtt_view')
@@ -85,7 +101,7 @@ function M.setup(opts)
                 buffer = rtt_view.get_buffer
             })
         else
-            utils.debug('nvim-dap-view not installed, cannot register RTT view')
+            utils.warn('nvim-dap-view not installed, cannot register RTT view')
         end
     end
 end
